@@ -123,10 +123,8 @@ function index() {
       formDataToSend.append('aggregator_name', formData.aggregator_name);
       formDataToSend.append('email', formData.email);
       formDataToSend.append('phone', formData.phone);
-      if (formData.logo && typeof formData.logo !== 'string') {
-        formDataToSend.append('logo', formData.logo[0]); // Append the file if it's a new file
-      }
-  
+      formDataToSend.append('logo', formData.logo);
+      
       // Log the form data being sent
       for (let [key, value] of formDataToSend.entries()) {
         console.log(key, value);
