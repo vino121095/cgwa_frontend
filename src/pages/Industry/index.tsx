@@ -90,40 +90,48 @@ function index() {
   };
   
 
-  const handleEditSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  
-    const formDataToSend = new FormData();
-    formDataToSend.append("industry_id", formData.industry_id);
-    formDataToSend.append("username", formData.username);
-    formDataToSend.append("industryname", formData.industryname);
-    formDataToSend.append("email", formData.email);
-    formDataToSend.append("phone", formData.phone);
-  
-    if (formData.logo && typeof formData.logo !== "string") {
-      formDataToSend.append("logo", formData.logo[0]); // Ensure it's a File object
-    }
+  const handleEditSubmit = async (e) => {
+    e.preventDefault(); // Prevent the default form submission behavior
   
     try {
+      // Prepare the form data
+      const formDataToSend = new FormData();
+      formDataToSend.append('industry_id', formData.industry_id);
+      formDataToSend.append('username', formData.username);
+      formDataToSend.append('industryname', formData.industryname);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('logo', formData.logo);
+      
+      // Log the form data being sent
+      for (let [key, value] of formDataToSend.entries()) {
+        console.log(key, value);
+      }
+  
+      // Send the PUT request to the API
       const response = await fetch(
         `http://127.0.0.1:8000/api/industry/update/${formData.industry_id}`,
         {
-          method: "put", // Change to POST if the backend does not support PUT with FormData
-          body: formDataToSend,
+          method: 'PUT',
+          body: formDataToSend, // Use FormData for file uploads
         }
       );
+      console.log("img update",formData.logo)
+  
+      // Log the response status and body
+      console.log('Response status:', response.status);
+      const result = await response.json();
+      console.log('Response body:', result);
   
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to update industry: ${errorText}`);
+        throw new Error(result.message || 'Failed to update industry');
       }
   
-      const data = await response.json();
-      console.log("Update Successful", data);
-      alert("Industry updated successfully!");
+      // Handle success (e.g., show a success message or redirect)
+      alert('Industry updated successfully!');
     } catch (error) {
-      console.error("Error:", error);
-      alert(`Failed to update industry: ${error.message}`);
+      console.error('Error updating industry:', error);
+      alert(error.message || 'Failed to update industry. Please try again.');
     }
   };
   
@@ -253,7 +261,7 @@ function index() {
       },
       {
         accessorKey: 'username', //access nested data with dot notation
-        header: 'Industry Name',
+        header: 'User Name',
         size: 100
       },
       {
@@ -491,7 +499,7 @@ function index() {
       </Slideover>
       {/* END: Slide Over Content */}
 
-            {/* Edit Aggregator */}
+            {/* Edit Industry */}
             <Slideover
         staticBackdrop
         open={headerFooterEditSlideoverPreview}
@@ -512,13 +520,13 @@ function index() {
             <Lucide icon="X" className="w-8 h-8 text-slate-400" />
           </a>
           <Slideover.Title>
-            <h2 className="mr-auto text-base font-medium">Edit Aggregator</h2>
+            <h2 className="mr-auto text-base font-medium">Edit Industry</h2>
           </Slideover.Title>
           <Slideover.Description>
             <form onSubmit={handleEditSubmit}>
             <div>
                 <FormLabel htmlFor="industry-id">Industry Id</FormLabel>
-                <FormInput id="industry_id" type="text" placeholder="Enter the industry_id" value={formData.industry_id} onChange={handleChange} />
+                <FormInput id="industry_id" type="text" placeholder="Enter the industry_id" value={formData.industry_id} onChange={handleChange}  />
               </div>
               <div>
                 <FormLabel htmlFor="username">Username</FormLabel>
