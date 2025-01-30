@@ -51,27 +51,39 @@ function Index() {
   const [devicesheaderFooterSlideoverPreview, setDevicesHeaderFooterSlideoverPreview] = useState(false);
   const [selectedSiteId, setSelectedSiteId] = useState<number | null>(null);
   const [sites, setSites] = useState([]);
+  // const [aggregators, setAggregators] = useState([]);
+  // const [aggreatorSelect, SetAggreatorSelect] = useState(" ");
+
   const [aggregators, setAggregators] = useState([]);
+  const [aggreatorSelect, SetAggreatorSelect] = useState('');
+
+  const [industry, setIndustry] = useState([]);
+  const [industrySelect, SetIndustrySelect] = useState('');
+
+  useEffect(() => {
+    const fetchIndustry = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/industry/all');
+        if (!response.ok) throw new Error('Network response error');
+        const data = await response.json();
+        setIndustry(data.data);
+      } catch (error) {
+        console.error('Error fetching industry:', error);
+      }
+    };
+
+    fetchIndustry();
+  }, []);
 
   useEffect(() => {
     const fetchAggregators = async () => {
       try {
         const response = await fetch('http://127.0.0.1:8000/api/aggregator/all');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
+        if (!response.ok) throw new Error('Network response error');
         const data = await response.json();
-
-        // Check if data is an array
-        if (Array.isArray(data)) {
-          setAggregators(data);
-        } else {
-          console.error('Expected an array but got:', data);
-          setAggregators([]); // Set to empty array if not an array
-        }
+        setAggregators(data.data);
       } catch (error) {
         console.error('Error fetching aggregators:', error);
-        setAggregators([]); // Set to empty array on error
       }
     };
 
@@ -821,24 +833,37 @@ function Index() {
               <div>
                 <FormLabel>Select Aggregator</FormLabel>
                 <TomSelect
-                  value={formData.aggregator_id}
-                  onChange={(value) => setFormData(prev => ({ ...prev, aggregator_id: value }))}
-                  options={aggregators.map(aggregator => ({
-                    value: aggregator.id, // Adjust based on your API response structure
-                    text: aggregator.id // Adjust based on your API response structure
-                  }))}
-                />
+                  value={aggreatorSelect}
+                  onChange={(e) => SetAggreatorSelect(e.target.value)}
+                  options={{
+                    placeholder: "Select a aggregator",
+                  }}
+                  className="w-full"
+                >
+                  {aggregators.map((aggregator) => (
+                    <option key={aggregator.id} value={aggregator.id}>
+                      {aggregator.id}
+                    </option>
+                  ))}
+                </TomSelect>
               </div>
 
               <div>
                 <FormLabel>Select Industry</FormLabel>
                 <TomSelect
-                  value={formData.industry_id}
-                  onChange={(value) => setFormData(prev => ({ ...prev, industry_id: value }))}
-                  options={[
-                    { value: '', text: 'Industry 1' }
-                  ]}
-                />
+                  value={industrySelect}
+                  onChange={(e) => SetIndustrySelect(e.target.value)}
+                  options={{
+                    placeholder: "Select a aggregator",
+                  }}
+                  className="w-full"
+                >
+                  {industry.map((industry) => (
+                    <option key={industry.id} value={industry.id}>
+                      {industry.id}
+                    </option>
+                  ))}
+                </TomSelect>
               </div>
               <div>
                 <FormLabel>Auth Key</FormLabel>
@@ -1014,26 +1039,38 @@ function Index() {
                 {/* IDs */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <FormLabel>Aggregator ID</FormLabel>
-                    <TomSelect
-                      value="aggregator_id"
-                      onChange={(value) => SetAggreatorSelect(value)}
-                      options={{ placeholder: 'Select an aggregator' }}
-                      className="w-full"
-                    >
-                      <option value="Aggreator 1">Aggreator 1</option>
-                      <option value="Aggreator 2">Aggreator 2</option>
-                    </TomSelect>
+                  <FormLabel>Aggregator ID</FormLabel>
+                  <TomSelect
+                  value={aggreatorSelect}
+                  onChange={(e) => SetAggreatorSelect(e.target.value)}
+                  options={{
+                    placeholder: "Select a aggregator",
+                  }}
+                  className="w-full"
+                >
+                  {aggregators.map((aggregator) => (
+                    <option key={aggregator.id} value={aggregator.id}>
+                      {aggregator.aggregator_name}
+                    </option>
+                  ))}
+                </TomSelect>
                   </div>
                   <div>
                     <FormLabel>Industry ID</FormLabel>
                     <TomSelect
-                      value={formDataEdit.industry_id}
-                      onChange={(value) => setFormDataEdit({ ...formDataEdit, industry_id: value })}
-                      options={[
-                        { value: '', text: 'Industry 1' },
-                      ]}
-                    />
+                  value={industrySelect}
+                  onChange={(e) => SetIndustrySelect(e.target.value)}
+                  options={{
+                    placeholder: "Select a aggregator",
+                  }}
+                  className="w-full"
+                >
+                  {industry.map((industry) => (
+                    <option key={industry.id} value={industry.id}>
+                      {industry.industry_name}
+                    </option>
+                  ))}
+                </TomSelect>
                   </div>
                 </div>
 
